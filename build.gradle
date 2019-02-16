@@ -1,12 +1,11 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id "com.jfrog.artifactory" version "3.1.1"
 }
 
 println 'Compiling LibsDisguises via Gradle ver. ' + gradle.gradleVersion
 
-sourceCompatibility = '1.7'
+sourceCompatibility = '1.8'
 ext.spigotVersion = '1.8.8-R0.1-SNAPSHOT'
 
 ext.disguisesVersion = '8.6.8'
@@ -14,6 +13,7 @@ ext.disguisesVersion = '8.6.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 repositories {
+	mavenLocal();
     mavenCentral()
 
     maven {
@@ -28,10 +28,6 @@ repositories {
     maven {
         name 'dmulloy2-repo'
         url 'http://repo.dmulloy2.net/content/groups/public/'
-    }
-
-    flatDir {
-        dir 'libs'
     }
 }
 
@@ -55,49 +51,9 @@ artifacts {
     archives jar
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'LibsDisguises'
-            artifactId 'LibsDisguises'
-            version disguisesVersion + '-SNAPSHOT'
-            from components.java
-            artifact sourceJar {
-                classifier = 'sources'
-            }
-            artifact javadocJar {
-                classifier = 'javadoc'
-            }
-        }
-    }
-}
-
-artifactoryPublish.skip = false
-
-artifactory {
-    contextUrl = 'http://localhost:8081/artifactory'
-    publish {
-        repository {
-            repoKey = 'libs-snapshot-local'
-            username = '${artifactory_user}'
-            password = '${artifactory_password}'
-        }
-        defaults {
-            publications('mavenJava')
-        }
-    }
-    resolve {
-        repoKey = 'repo'
-    }
-}
-
-file('libs').mkdirs()
-
-ant.get src: 'http://server.o2gaming.com/downloads/spigot.jar', dest: file('libs'), verbose: false, skipexisting: true
-
 dependencies {
     compile "org.spigotmc:spigot-api:$project.ext.spigotVersion"
-    compile 'com.comphenix.protocol:ProtocolLib:3.6.5'
-    compile name: 'spigot'
+    compile 'com.comphenix.protocol:ProtocolLib:4.4.0'
+    compile "org.spigotmc:spigot:$project.ext.spigotVersion"
     testCompile group: 'junit', name: 'junit', version: '4.10'
 }
